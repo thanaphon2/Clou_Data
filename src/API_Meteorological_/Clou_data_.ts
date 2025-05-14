@@ -21,7 +21,7 @@ export const Get_data_ = async (req: Request, res: Response, next: NextFunction)
     try{
         const mydata_Clou_ = await myDataSource.getRepository(MeteoroLogical)
         const find_data = await mydata_Clou_.find()
-        find_data && res.send(find_data)
+        res.send(find_data)
     }catch(err){
         console.log("เกิดข้อผิพลาดไม่สามารถเชื่อมต่อได้ :(",err)
         res.status(501).json({Error: "เกิดข้อผิพลาดไม่สามารถเชื่อมต่อได้😒😒", err})
@@ -32,7 +32,7 @@ export const Get_data_ = async (req: Request, res: Response, next: NextFunction)
 export const Get_ID_data_ = async (req: Request, res: Response, next: NextFunction) => {
     try{
         const mydata_Clou_ = await myDataSource.getRepository(MeteoroLogical)
-        const find_id_data = await mydata_Clou_.findOne({ where: { id: Number(req.body.params)}})
+        const find_id_data = await mydata_Clou_.find({ where: { id: Number(req.body.params)}})
         if(!find_id_data) {
             res.status(401).json({ Error: "เกิดข้อผิดพลาดไม่มีข้อมูลหรือไอดีไม่ถูกต้อง U_U"})
         }else{

@@ -27,7 +27,7 @@ app.use('/api', rou)
 app.post('/api/test', (req, res) => {
   console.log(req.body);
   res.send("Hello from /api/test");
-});
+})
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
