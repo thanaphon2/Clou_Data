@@ -1,4 +1,19 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany, ManyToOne } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, OneToMany, ManyToOne} from "typeorm"
+
+@Entity()
+export class User {
+    @PrimaryGeneratedColumn()
+    id?: number
+
+    @Column()
+    username!: string
+
+    @Column()
+    email!: string
+
+    @Column()
+    password!: string
+}
 
 @Entity()
 export class Location {
@@ -19,12 +34,27 @@ export class Location {
 
     @OneToMany(() => MeteoroLogical,(meteorological) => meteorological.location_id)
     meteorological_id!: MeteoroLogical[]
+
+    @OneToMany(() => Ges, (ges) => ges.location_id)
+    ges_id!: Ges[]
 }
 
 @Entity()
 export class MeteoroLogical {
     @PrimaryGeneratedColumn()
     id?: number
+
+    @Column({ type: 'float', nullable: true})
+    year!: number
+
+    @Column({ type: 'float', nullable: true})
+    month!: number
+
+    @Column( { type: 'float', nullable: true})
+    day!: number
+
+    @Column({ type: 'float', nullable: true})
+    hours!: number
 
     @Column({type: 'float', nullable: true})
     temperaturde!: number
@@ -56,3 +86,107 @@ export class MeteoroLogical {
     @ManyToOne(() => Location,(location) => location.meteorological_id)
     location_id!: Location[]
 }
+
+@Entity()
+export class Ges{
+    @PrimaryGeneratedColumn()
+    id?: number
+
+    @Column({ type: 'float', nullable: true})
+    year!: number
+
+    @Column({ type: 'float', nullable: true})
+    month!: number
+
+    @Column( { type: 'float', nullable: true})
+    day!: number
+
+    @Column({ type: 'float', nullable: true})
+    hours!: number
+
+    @OneToMany(() => Choho, (choho) => choho.ges_id)
+    choho_id!: Choho[]
+
+    @OneToMany(() => So2, (so2) => so2.ges_id)
+    so2_id!: So2[]
+
+    @OneToMany(() => No2, (no2) => no2.ges_id)
+    no2_id!: No2[]
+
+    @ManyToOne(() => Location, (location) => location.ges_id)
+    location_id!: Location[]
+}
+
+
+@Entity()
+export class So2 {
+    @PrimaryGeneratedColumn()
+    id!: number
+
+    @Column()
+    so2_name!: string
+
+    @Column({ type: 'float', nullable: true })
+    so2!: number
+
+    @Column({ type: 'float', nullable: true })
+    aod!: number
+
+    @Column({ type: 'float', nullable: true })
+    o3!: number
+
+    @Column({ type: 'float', nullable: true })
+    flag!: number
+
+    @ManyToOne(() => Ges, (ges) => ges.so2_id)
+    ges_id!: Ges
+}
+
+@Entity()
+export class Choho{
+    @PrimaryGeneratedColumn()
+    id!: number
+
+    @Column()
+    choho_name!: string
+
+    @Column({ type: 'float', nullable: true })
+    choho!: number
+
+    @Column({ type: 'float', nullable: true })
+    aod!: number
+
+    @Column({ type: 'float', nullable: true })
+    o3!: number
+
+    @Column({ type: 'float', nullable: true })
+    flag!: number
+
+    @ManyToOne(() => Ges, (ges) => ges.choho_id)
+    ges_id!: Ges
+}
+
+@Entity()
+export class No2 {
+    @PrimaryGeneratedColumn()
+    id!: number
+
+    @Column()
+    no2_name!: string
+
+    @Column({ type: 'float', nullable: true})
+    no2!: number
+
+    @Column({ type: 'float', nullable: true })
+    aod!: number
+
+    @Column({ type: 'float', nullable: true })
+    o3!: number
+
+    @Column({ type: 'float', nullable: true })
+    flag!: number
+
+    @ManyToOne(() => Ges, (ges) => ges)
+    ges_id!: Ges
+}
+
