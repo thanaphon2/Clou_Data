@@ -186,6 +186,9 @@ export class No2 {
     @Column({ type: 'float', nullable: true })
     flag!: number
 
+    @Column({ type: 'float', nullable: true })
+    slant!: number
+
     @ManyToOne(() => Ges, (ges) => ges)
     ges_id!: Ges
 }

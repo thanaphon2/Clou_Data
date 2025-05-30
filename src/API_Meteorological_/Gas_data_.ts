@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction, json} from "express";
 import { myDataSource } from "../Dataconnext/app-data-source";
-import { Ges, So2, Choho, No2 } from "../tableconnext/meteorological_data";
+import { Location,Ges, So2, Choho, No2 } from "../tableconnext/meteorological_data";
 import { ges_no2, ges_choho, ges_so2 } from "../Orm_All/Gas_";
 
 export const Ges_data_post_ = async (req: Request, res: Response, next: NextFunction) => {
@@ -40,14 +40,15 @@ export const So2_SaveApi = async (req: Request, res: Response, next: NextFunctio
     try{
         const so2_data = await myDataSource.getRepository(So2)
         const ges_data = await myDataSource.getRepository(Ges)
-        const { year, month, day, hours, so2 }: any = req.body
-        const data = { year, month, day, hours}
+        const { year, month, day, hours, location_id, so2 }: any = req.body
+        const data = { year, month, day, hours, location_id}
          const ges_cheke_date = await ges_data.findOne({
             where: { 
                 year: Number(req.body.year), 
                 month: Number(req.body.month), 
                 day: Number(req.body.day), 
-                hours: Number(req.body.hours)
+                hours: Number(req.body.hours),
+                location_id: {id: Number(req.body.location_id)}
             }
         })
         if(ges_cheke_date){
@@ -128,7 +129,8 @@ export const No2_SaveApi = async (req: Request, res: Response, next: NextFunctio
                 year: Number(req.body.year), 
                 month: Number(req.body.month), 
                 day: Number(req.body.day), 
-                hours: Number(req.body.hours)
+                hours: Number(req.body.hours),
+                location_id: {id: Number(req.body.location_id)}
             }
         })
         if(ges_cheke_date){
@@ -158,3 +160,50 @@ export const No2_SaveApi = async (req: Request, res: Response, next: NextFunctio
         res.status(500).json({ Error: "เกิดข้อผิดพลาดไม่สามารเข้าถึงได้ 😑", err})
     }
 }
+
+
+export const Separate_yearmoth = async (req: Request, res: Response, next: NextFunction) => {
+    try{
+        const months = await myDataSource.getRepository(Ges)
+        .createQueryBuilder("ges")
+        .select(["ges.year", "ges.month"])
+        .groupBy("ges.year")
+        .addGroupBy("ges.month")
+        .orderBy("ges.year", "DESC")
+        .addOrderBy("ges.month", "DESC")
+        .getRawMany();
+
+        res.json(months);
+
+    }catch(err){
+        console.error("เกิดข้อผิดพลาดไม่สามารเข้าถึงได้ 😑",err)
+        next(err)
+        res.status(500).json({ Error: "เกิดข้อผิดพลาดไม่สามารเข้าถึงได้ 😑", err})
+    }
+}
+
+export const Show_data_so2 = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const locationRepo = myDataSource.getRepository(Location);
+
+        const data = await locationRepo.createQueryBuilder('location')
+            .leftJoinAndSelect('location.ges_id', 'ges')
+            .leftJoinAndSelect('ges.so2_id', 'so2')
+            .where('ges.year = :year', { year: Number(req.params.year) })
+            .andWhere('ges.month = :month', { month: Number(req.params.month) })
+            .andWhere('so2.id IS NOT NULL')
+            .getMany();
+
+        if (data.length === 0) {
+            res.status(404).json({ message: "ไม่มีข้อมูลที่เชื่อมกับ so2_id" });
+        }
+
+        res.json(data);
+
+    } catch (err) {
+        console.error("เกิดข้อผิดพลาดไม่สามารถแสดงข้อมูลได้", err);
+        res.status(500).json({ message: "เกิดข้อผิดพลาดไม่สามารถแสดงข้อมูลได้", error: err });
+    }
+}
+
+
