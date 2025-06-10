@@ -193,3 +193,83 @@ export class No2 {
     ges_id!: Ges
 }
 
+@Entity()
+export class AirQualityStation{
+    @PrimaryGeneratedColumn()
+    id!: number
+
+    @Column({ type: 'float', nullable: true})
+    year!: number
+
+    @Column({ type: 'float', nullable: true})
+    month!: number
+
+    @Column( { type: 'float', nullable: true})
+    day!: number
+
+    @Column({ type: 'float', nullable: true})
+    hours!: number
+    
+    @CreateDateColumn()
+    createdAt!: Date
+
+    @Column()
+    area!: string
+
+    @Column()
+    nameTH!: string
+
+    @Column()
+    nameEN!: string
+
+    @Column()
+    stationType!: string
+
+    @Column('decimal', { precision: 10, scale: 6 })
+    lat!: number;
+
+    @Column('decimal', { precision: 10, scale: 6 })
+    long!: number;
+
+    @OneToMany(() => PM25, (pm25) => pm25.air_id)
+    pm25_id!: PM25[]
+
+    @OneToMany(() => PM10, (pm10) => pm10.air_id)
+    pm10_id!: PM10[]
+}
+
+@Entity()
+export class PM25{
+    @PrimaryGeneratedColumn()
+    id!: number
+
+    @Column()
+    color_id!: number
+
+    @Column({ type: 'float', nullable: true})
+    aqi!: number
+
+    @Column({ type: 'float', nullable: true})
+    value!: number
+
+    @ManyToOne(() => AirQualityStation, (air) => air.pm25_id)
+    air_id!: AirQualityStation[]
+}
+
+@Entity()
+export class PM10{
+    @PrimaryGeneratedColumn()
+    id!: number
+
+    @Column()
+    color_id!: number
+
+    @Column({ type: 'float', nullable: true})
+    aqi!: number
+
+    @Column({ type: 'float', nullable: true})
+    value!: number
+
+    @ManyToOne(() => AirQualityStation, (air) => air.pm10_id)
+    air_id!: AirQualityStation[]
+}
