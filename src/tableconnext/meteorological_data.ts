@@ -32,11 +32,23 @@ export class Location {
     @Column({ type: "timestamp", default: () => "CURRENT_TIMESTAMP" })
     date!: Date
 
+    @Column()
+    area!: string
+
+    @Column()
+    nameTH!: string
+
+    @Column()
+    nameEN!: string
+
     @OneToMany(() => MeteoroLogical,(meteorological) => meteorological.location_id)
     meteorological_id!: MeteoroLogical[]
 
     @OneToMany(() => Ges, (ges) => ges.location_id)
     ges_id!: Ges[]
+
+    @OneToMany(() => AirQualityStation, (air) => air.location_id)
+    air_id!: AirQualityStation[]
 }
 
 @Entity()
@@ -230,6 +242,9 @@ export class AirQualityStation{
 
     @Column('decimal', { precision: 10, scale: 6 })
     long!: number;
+
+    @ManyToOne(() => Location, (location) => location.air_id)
+    location_id!: Location[]
 
     @OneToMany(() => PM25, (pm25) => pm25.air_id)
     pm25_id!: PM25[]

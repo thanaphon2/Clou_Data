@@ -3,7 +3,8 @@ import { Post_data_, Get_data_, Get_ID_data_, Put_data_ } from "../API_Meteorolo
 import { Location_Post_, Location_get, Location_get_id } from "../API_Meteorological_/Location_data_"
 import { User_data_register, User_Login_ } from "../API_Meteorological_/user_data_"
 // import { User_data_register } from "../API_Meteorological_/user_data_"
-import { So2_SaveApi, Choho_SaveApi, No2_SaveApi, Separate_yearmoth, Show_data_so2 } from "../API_Meteorological_/Gas_data_"
+import { So2_SaveApi, Choho_SaveApi, No2_SaveApi, Separate_yearmoth, Show_data_so2, So2_Year, So2_Day, so2_ShowData } from "../API_Meteorological_/Gas_data_"
+import { AirQualityStation_save_Data_, Air4_Pm25_Showdata_All} from "../API_Meteorological_/Air4_Pm25_"
 let rou = express.Router()
 
 rou.post('/postdataclou', Post_data_)
@@ -22,11 +23,17 @@ rou.post('/login', User_Login_)
 rou.post('/so2save', So2_SaveApi)
 rou.get('/Separate', Separate_yearmoth)
 rou.get('/gesso2/:year/:month', Show_data_so2)
+rou.get('/gesso2/:year/:month/:day', So2_Day)
+rou.get('/gesso2/:year', So2_Year)
+rou.get('/gesso2/:name_location',so2_ShowData)
 
 rou.post('/chohosave', Choho_SaveApi)
 
 rou.post('/no3save', No2_SaveApi)
 
 // rou.post('/register', User_data_register)
+
+rou.post('/Pm25_apipostair4', AirQualityStation_save_Data_)
+rou.get('/airPmshowdata', Air4_Pm25_Showdata_All)
 
 export default rou

@@ -206,4 +206,44 @@ export const Show_data_so2 = async (req: Request, res: Response, next: NextFunct
     }
 }
 
+export const So2_Day = async (req: Request, res: Response, next: NextFunction) => {
+    try{
+        const ges_data = await myDataSource.getRepository(Ges)
+        const ges_find_day  = await ges_data.find({ where: {year: Number(req.params.year), month: Number(req.params.month), day: Number(req.params.day)}, relations: ['so2_id']})
+        if(!ges_data){
+            res.status(401).json({Error: "ไม่ข้อมูลในวันนั้น 😑"})
+        }else{
+            res.json(ges_find_day)
+        }
+    }catch(err){
+        console.error("เกิดข้อผิดพลาดไม่สามารถแสดงข้อมูลได้", err);
+        res.status(500).json({ message: "เกิดข้อผิดพลาดไม่สามารถแสดงข้อมูลได้", error: err });
+    }
+}
+
+export const So2_Year = async (req: Request, res: Response, next: NextFunction) => {
+    try{
+        const ges_data = await myDataSource.getRepository(Ges)
+        const ges_find_day  = await ges_data.find({ where: {year: Number(req.params.year)},  relations: ['so2_id']})
+        if(!ges_data){
+            res.status(401).json({Error: "ไม่ข้อมูลในวันนั้น 😑"})
+        }else{
+            res.json(ges_find_day)
+        }
+    }catch(err){
+        console.log(err)
+        next(err)
+    }
+}
+
+export const so2_ShowData = async (req: Request, res: Response, next: NextFunction) => {
+    try{
+        const ges_data = await myDataSource.getRepository(Ges)
+        const ges_so2_showdata = await ges_data.find({ relations: ['so2_id'], where: {location_id: {name_location: String(req.params.name_location)}}})
+        res.json(ges_so2_showdata)
+    }catch(err){
+        console.error("เกิดข้อผิดพลาดไม่สามารถแสดงข้อมูลได้", err);
+        res.status(500).json({ message: "เกิดข้อผิดพลาดไม่สามารถแสดงข้อมูลได้", error: err });
+    }
+}
 

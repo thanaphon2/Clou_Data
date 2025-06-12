@@ -10,9 +10,10 @@ services:
       MYSQL_USER: user
       MYSQL_PASSWORD: Dream48020?
     ports:
-      - "3307:3306"  
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+      - ./my.cnf:/etc/mysql/conf.d/my.cnf
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin

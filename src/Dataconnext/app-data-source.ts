@@ -1,5 +1,5 @@
 import { DataSource } from "typeorm"
-import { MeteoroLogical,Location, Ges, User, So2, Choho, No2} from "../tableconnext/meteorological_data"
+import { MeteoroLogical,Location, Ges, User, So2, Choho, No2, AirQualityStation, PM10, PM25} from "../tableconnext/meteorological_data"
 
 // export const myDataSource = new DataSource({
 //     type: "mysql",
@@ -8,7 +8,7 @@ import { MeteoroLogical,Location, Ges, User, So2, Choho, No2} from "../tableconn
 //     username: "root",
 //     password: "Dream480201?",
 //     database: "m",
-//     entities: [MeteoroLogical, Location, Ges, User, So2, Choho, No2],
+//     entities: [MeteoroLogical, Location, Ges, User, So2, Choho, No2, AirQualityStation, PM10, PM25],
 //     logging: true,
 //     synchronize: true,
 // })
@@ -20,7 +20,8 @@ export const myDataSource = new DataSource({
     username: "user",
     password: "Dream48020?",
     database: "mydb",
-    entities: [MeteoroLogical, Location, Ges, User, So2, Choho, No2],
+    charset: 'utf8mb4',
+    entities: [MeteoroLogical, Location, Ges, User, So2, Choho, No2, AirQualityStation, PM10, PM25],
     logging: true,
     synchronize: true,
 })
