@@ -66,24 +66,33 @@ export const Air4_Pm25_Showdata_All = async (req: Request, res: Response, next: 
 
 export const Pm25_Now = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const data = await myDataSource
-      .getRepository(Location)
-      .createQueryBuilder('location')
-      .leftJoinAndSelect('location.air_id', 'air')
-      .leftJoinAndSelect(
-        qb => qb
-          .from(PM25, 'pm25')
-          .distinctOn(['pm25.air_id']) 
-          .orderBy('pm25.air_id')
-          .addOrderBy('pm25.id', 'DESC'), 
-        'pm25',
-        'pm25.air_id = air.id'
+    const airRepo = myDataSource.getRepository(AirQualityStation);
+
+    const subQuery = airRepo
+      .createQueryBuilder("sub_air")
+      .select("MAX(sub_air.createdAt)", "maxCreatedAt")
+      .addSelect("sub_air.location_id", "location_id")
+      .groupBy("sub_air.location_id");
+
+    const latestAirData = await airRepo
+      .createQueryBuilder("air")
+      .innerJoin(
+        "(" + subQuery.getQuery() + ")",
+        "latest",
+        "air.location_id = latest.location_id AND air.createdAt = latest.maxCreatedAt"
       )
+      .leftJoinAndSelect("air.location_id", "location")
+      .leftJoinAndSelect("air.pm25_id", "pm25")
+      .leftJoinAndSelect("air.pm10_id", "pm10")
+      .orderBy("air.createdAt", "DESC")
       .getMany();
 
-    res.json(data);
+    res.json(latestAirData);
   } catch (err) {
-    console.error("เกิดข้อผิดพลาด: ", err);
-    res.status(500).json({ Error: "เกิดข้อผิดพลาดไม่สามารถเข้าถึงได้ 😑", err });
+    console.error("❌ Error fetching latest air data:", err);
+    res.status(500).json({
+      error: "เกิดข้อผิดพลาดไม่สามารถเข้าถึงข้อมูลล่าสุดของอากาศได้",
+      detail: err,
+    });
   }
 };
