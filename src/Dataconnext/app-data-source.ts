@@ -24,4 +24,7 @@ export const myDataSource = new DataSource({
     entities: [MeteoroLogical, Location, Ges, User, So2, Choho, No2, AirQualityStation, PM10, PM25],
     logging: true,
     synchronize: true,
+    extra: {
+        charset: "utf8mb4_unicode_ci" 
+    }
 })

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { myDataSource } from "../Dataconnext/app-data-source";
-import { AirQualityStation, PM10, PM25 } from "../tableconnext/meteorological_data";
+import { AirQualityStation, PM10, PM25, Location } from "../tableconnext/meteorological_data";
 import { Pm10, Pm25, Pm25_save, Pm10_save, Pm_save_10_25 } from "../Orm_All/Pm_";
 
 export const AirQualityStation_save_Data_ = async (req: Request, res: Response, next: NextFunction) => {
@@ -63,3 +63,27 @@ export const Air4_Pm25_Showdata_All = async (req: Request, res: Response, next: 
         res.status(500).json({ Error: "เกิดข้อผิดพลาดไม่สามารเข้าถึงได้ 😑 ", err})
     }
 }
+
+export const Pm25_Now = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const data = await myDataSource
+      .getRepository(Location)
+      .createQueryBuilder('location')
+      .leftJoinAndSelect('location.air_id', 'air')
+      .leftJoinAndSelect(
+        qb => qb
+          .from(PM25, 'pm25')
+          .distinctOn(['pm25.air_id']) 
+          .orderBy('pm25.air_id')
+          .addOrderBy('pm25.id', 'DESC'), 
+        'pm25',
+        'pm25.air_id = air.id'
+      )
+      .getMany();
+
+    res.json(data);
+  } catch (err) {
+    console.error("เกิดข้อผิดพลาด: ", err);
+    res.status(500).json({ Error: "เกิดข้อผิดพลาดไม่สามารถเข้าถึงได้ 😑", err });
+  }
+};
