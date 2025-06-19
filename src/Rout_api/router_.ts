@@ -4,7 +4,7 @@ import { Location_Post_, Location_get, Location_get_id } from "../API_Meteorolog
 import { User_data_register, User_Login_ } from "../API_Meteorological_/user_data_"
 // import { User_data_register } from "../API_Meteorological_/user_data_"
 import { So2_SaveApi, Choho_SaveApi, No2_SaveApi, Separate_yearmoth, Show_data_so2, So2_Year, So2_Day, so2_ShowData } from "../API_Meteorological_/Gas_data_"
-import { AirQualityStation_save_Data_, Air4_Pm25_Showdata_All, Pm25_Now} from "../API_Meteorological_/Air4_Pm25_"
+import { AirQualityStation_save_Data_, Air4_Pm25_Showdata_All, Pm25_Now, Show_datalocation} from "../API_Meteorological_/Air4_Pm25_"
 let rou = express.Router()
 
 rou.post('/postdataclou', Post_data_)
@@ -36,5 +36,6 @@ rou.post('/no3save', No2_SaveApi)
 rou.post('/Pm25_apipostair4', AirQualityStation_save_Data_)
 rou.get('/airPmshowdata', Air4_Pm25_Showdata_All)
 rou.get('/pmshownow', Pm25_Now)
+rou.get('/airpm/:yaer/:month/:id', Show_datalocation)
 
 export default rou

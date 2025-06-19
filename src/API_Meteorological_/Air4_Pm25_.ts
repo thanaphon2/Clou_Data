@@ -96,3 +96,16 @@ export const Pm25_Now = async (req: Request, res: Response, next: NextFunction) 
     });
   }
 };
+
+export const Show_datalocation = async ( req: Request, res: Response, next: NextFunction) => {
+  try{
+    console.log("fffsfsfs", req.params)
+    const arimydatasource = await myDataSource.getRepository(AirQualityStation)
+    const locatiom_showdatapm = await arimydatasource.find({where: {year: Number(req.params.yaer), month: Number(req.params.month), location_id: {id: Number(req.params.id)}}, relations: ['pm25_id', 'location_id']})
+    res.json(locatiom_showdatapm)
+  }catch(err){
+    console.error("เกิดข้อผิดพลาด: ",err)
+    next(err)
+    res.status(500).json({ Error: "เกิดข้อผิดพลาดไม่สามารเข้าถึงได้ 😑 ", err})
+  }
+}
