@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import { myDataSource } from "../Dataconnext/app-data-source";
 import { AirQualityStation, PM10, PM25, Location } from "../tableconnext/meteorological_data";
 import { Pm10, Pm25, Pm25_save, Pm10_save, Pm_save_10_25 } from "../Orm_All/Pm_";
+import { Repository, Not, IsNull } from "typeorm";
 
 export const AirQualityStation_save_Data_ = async (req: Request, res: Response, next: NextFunction) => {
     try{
@@ -99,9 +100,8 @@ export const Pm25_Now = async (req: Request, res: Response, next: NextFunction) 
 
 export const Show_datalocation = async ( req: Request, res: Response, next: NextFunction) => {
   try{
-    console.log("fffsfsfs", req.params)
     const arimydatasource = await myDataSource.getRepository(AirQualityStation)
-    const locatiom_showdatapm = await arimydatasource.find({where: {year: Number(req.params.yaer), month: Number(req.params.month), location_id: {id: Number(req.params.id)}}, relations: ['pm25_id', 'location_id']})
+    const locatiom_showdatapm = await arimydatasource.find({where: {year: Number(req.params.year), month: Number(req.params.month), location_id: {id: Number(req.params.id)}, day: Number(req.params.day)}, relations: ['pm25_id', 'pm10_id', 'location_id']})
     res.json(locatiom_showdatapm)
   }catch(err){
     console.error("เกิดข้อผิดพลาด: ",err)
@@ -109,3 +109,71 @@ export const Show_datalocation = async ( req: Request, res: Response, next: Next
     res.status(500).json({ Error: "เกิดข้อผิดพลาดไม่สามารเข้าถึงได้ 😑 ", err})
   }
 }
+
+export const AirPM_ShowMonth = async (req: Request, res: Response, next: NextFunction) => {
+  try{
+    const arimydatasource = await myDataSource.getRepository(AirQualityStation)
+    const location_finddatamonth = await arimydatasource.find({ where: {year: Number(req.params.year), month: Number(req.params.month)}, relations: ['pm25_id', 'pm10_id', 'location_id']})
+    res.json(location_finddatamonth)
+  }catch(err){
+    console.error("เกิดข้อผิดพลาด: ",err)
+    next(err)
+    res.status(500).json({ Error: "เกิดข้อผิดพลาดไม่สามารเข้าถึงได้ 😑 ", err})
+  }
+}
+
+export const AirPM_ShowYear = async (req: Request, res: Response, next: NextFunction) => {
+  try{
+    const arimydatasource = await myDataSource.getRepository(AirQualityStation)
+    const location_finddatamonth = await arimydatasource.find({ where: {year: Number(req.params.year)}, relations: ['pm25_id', 'pm10_id', 'location_id']})
+    res.json(location_finddatamonth)
+  }catch(err){
+    console.error("เกิดข้อผิดพลาด: ",err)
+    next(err)
+    res.status(500).json({ Error: "เกิดข้อผิดพลาดไม่สามารเข้าถึงได้ 😑 ", err})
+  }
+}
+
+
+export const AirPm_showdata_Location = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const locationRepository = myDataSource.getRepository(Location);
+
+    const locations = await locationRepository.find({
+      where: {
+        air_id: {
+          id: Not(IsNull())
+        }
+      },
+      relations: ["air_id"],
+    });
+
+    if (locations.length === 0) {
+       res.status(404).json({ message: "ไม่พบข้อมูล Location ที่มี air_id เชื่อมโยง PM" });
+    }
+
+     res.json({
+      count: locations.length,
+      data: locations.map((loc) => ({
+        id: loc.id,
+        location_name: loc.name_location,
+        locationaname: loc.name_location,
+        latitude: loc.latitude,
+        longitude: loc.longitude,
+        air_id: loc.air_id
+      })),
+    });
+
+    // return res.json({
+    //   count: locations.length,
+    //   data: locations.map((loc) => ({
+    //     id: loc.id,
+    //     locationaname: loc.locationaname,
+    //     air_id: loc.air_id, // หรือ custom mapping ได้ เช่น loc.air_id.value
+    //   })),
+    // });
+  } catch (err) {
+    console.error("เกิดข้อผิดพลาด: ", err);
+     res.status(500).json({ error: "เกิดข้อผิดพลาดไม่สามารถเข้าถึงได้ 😑", details: err });
+  }
+};
